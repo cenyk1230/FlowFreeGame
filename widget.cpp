@@ -199,7 +199,7 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
     m_mx = event->x();
     m_my = event->y();
     qDebug() << m_mx << " " << m_my << endl;
-    if (isDrawing != -1) {
+    if (isDrawing != -1 && !isConnected(isDrawing)) {
         int lasti, lastj;
         int t = (int)m_path[isDrawing].size() - 1;
         lasti = m_path[isDrawing][t].x();
@@ -216,12 +216,17 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
                 if (isInitalPoint(i, j)) {
                     isDrawing = -1;
                 }else {
-                    while (m_path[m_arr[i][j]].size() > 0) {
-                        int t = (int)m_path[m_arr[i][j]].size() - 1;
-                        if (m_path[m_arr[i][j]][t] != QPoint(i, j))
-                            m_path[m_arr[i][j]].pop_back();
-                        else {
-                            m_path[m_arr[i][j]].pop_back();
+                    int color = m_arr[i][j];
+                    while (m_path[color].size() > 0) {
+                        int t = (int)m_path[color].size() - 1;
+                        if (m_path[color][t] != QPoint(i, j)) {
+                            if (!isInitalPoint(m_path[color][t]))
+                                m_arr[m_path[color][t].x()][m_path[color][t].y()] = 10000;
+                            m_path[color].pop_back();
+                        }else {
+                            if (!isInitalPoint(m_path[color][t]))
+                                m_arr[m_path[color][t].x()][m_path[color][t].y()] = 10000;
+                            m_path[color].pop_back();
                             break;
                         }
                     }
@@ -235,9 +240,11 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
                 }else {
                     while (m_path[isDrawing].size() > 0) {
                         int t = (int)m_path[isDrawing].size() - 1;
-                        if (m_path[isDrawing][t] != QPoint(i, j))
-                            m_path[m_arr[i][j]].pop_back();
-                        else
+                        if (m_path[isDrawing][t] != QPoint(i, j)) {
+                            if (!isInitalPoint(m_path[isDrawing][t]))
+                                m_arr[m_path[isDrawing][t].x()][m_path[isDrawing][t].y()] = 10000;
+                            m_path[isDrawing].pop_back();
+                        }else
                             break;
                     }
                 }
@@ -257,15 +264,18 @@ void Widget::mousePressEvent(QMouseEvent *event) {
     int i, j;
     
     if (getXY(i, j)) {
-        while (m_path[m_arr[i][j]].size() > 0) {
-            int t = (int)m_path[m_arr[i][j]].size() - 1;
-            if (m_path[m_arr[i][j]][t] != QPoint(i, j))
-                m_path[m_arr[i][j]].pop_back();
-            else
+        int color = m_arr[i][j];
+        while (m_path[color].size() > 0) {
+            int t = (int)m_path[color].size() - 1;
+            if (m_path[color][t] != QPoint(i, j)) {
+                if (!isInitalPoint(m_path[color][t]))
+                    m_arr[m_path[color][t].x()][m_path[color][t].y()] = 10000;
+                m_path[color].pop_back();
+            }else
                 break;
         }
-        if (m_path[m_arr[i][j]].size() == 0) {
-            m_path[m_arr[i][j]].push_back(QPoint(i, j));
+        if (m_path[color].size() == 0) {
+            m_path[color].push_back(QPoint(i, j));
         }
     }
     this->update();
@@ -286,6 +296,10 @@ bool Widget::isInitalPoint(int x, int y) {
     return false;
 }
 
+bool Widget::isInitalPoint(QPoint p) {
+    return isInitalPoint(p.x(), p.y());
+}
+
 bool Widget::isPathSource(int x, int y) {
     for (int i = 0; i < m_size; ++i)
         if (m_path[i].size() > 0) {
@@ -293,4 +307,17 @@ bool Widget::isPathSource(int x, int y) {
                 return true;
         }
     return false;
+}
+
+bool isInPath(const QPoint &p, const vector<QPoint> &VP) {
+    for (int i = 0; i < VP.size(); ++i)
+        if (p == VP[i])
+            return true;
+    return false;
+}
+
+bool Widget::isConnected(int color) {
+    QPoint p1 = QPoint(m_x[color * 2], m_y[color * 2]);
+    QPoint p2 = QPoint(m_x[color * 2 + 1], m_y[color * 2 + 1]);
+    return isInPath(p1, m_path[color]) && isInPath(p2, m_path[color]);
 }

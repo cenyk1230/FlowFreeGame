@@ -32,7 +32,9 @@ private:
     int getY(int);
     bool getXY(int &, int &);
     bool isInitalPoint(int, int);
+    bool isInitalPoint(QPoint);
     bool isPathSource(int, int);
+    bool isConnected(int);
     
     Ui::Widget *ui;
     GameGen *m_gen;
