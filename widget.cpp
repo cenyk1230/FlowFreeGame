@@ -60,6 +60,7 @@ int Widget::getY(int num) {
 }
 
 void Widget::paintEvent(QPaintEvent *) {
+    qDebug() << "Begin Drawing" << endl;
     QPainter painter(this); 
     painter.setBrush(Qt::black);
     painter.drawRect(0, 0, width(), height());
@@ -151,7 +152,7 @@ void Widget::paintEvent(QPaintEvent *) {
             painter.drawRect(x - s / m_size / 2, y - s / m_size / 2, s / m_size, s / m_size);
         }
     }
-    qDebug() << endl;
+    qDebug() << "End Drawing" << endl;
 }
 
 bool Widget::getXY(int &x, int &y) {
@@ -196,10 +197,18 @@ void Widget::newGame(int size) {
 }
 
 void Widget::mouseMoveEvent(QMouseEvent *event) {
+    qDebug() << "Begin mouseMoveEvent";
     m_mx = event->x();
     m_my = event->y();
-    qDebug() << m_mx << " " << m_my << endl;
+    qDebug() << m_mx << " " << m_my << " " << isDrawing << endl;
     if (isDrawing != -1 && !isConnected(isDrawing)) {
+        if (m_path[isDrawing].size() == 0) {
+            isMousePress = false;
+            isDrawing = -1;
+            this->update();
+            qDebug() << "End mouseMoveEvent";
+            return;
+        }
         int lasti, lastj;
         int t = (int)m_path[isDrawing].size() - 1;
         lasti = m_path[isDrawing][t].x();
@@ -214,6 +223,7 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
                 m_path[isDrawing].push_back(QPoint(i, j));
             }else if (m_arr[i][j] != isDrawing) {
                 if (isInitalPoint(i, j)) {
+                    isMousePress = false;
                     isDrawing = -1;
                 }else {
                     int color = m_arr[i][j];
@@ -254,9 +264,11 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
         }
     }
     this->update();
+    qDebug() << "End mouseMoveEvent";
 }
 
 void Widget::mousePressEvent(QMouseEvent *event) {
+    qDebug() << "Begin mousePressEvent";
     m_mx = event->x();
     m_my = event->y();
     isMousePress = true;
@@ -265,20 +277,31 @@ void Widget::mousePressEvent(QMouseEvent *event) {
     
     if (getXY(i, j)) {
         int color = m_arr[i][j];
-        while (m_path[color].size() > 0) {
-            int t = (int)m_path[color].size() - 1;
-            if (m_path[color][t] != QPoint(i, j)) {
+        if (isConnected(color) && isInitalPoint(i, j)) {
+            while (m_path[color].size() > 0) {
+                int t = (int)m_path[color].size() - 1;
                 if (!isInitalPoint(m_path[color][t]))
                     m_arr[m_path[color][t].x()][m_path[color][t].y()] = 10000;
                 m_path[color].pop_back();
-            }else
-                break;
-        }
-        if (m_path[color].size() == 0) {
+            }
             m_path[color].push_back(QPoint(i, j));
+        }else {
+            while (m_path[color].size() > 0) {
+                int t = (int)m_path[color].size() - 1;
+                if (m_path[color][t] != QPoint(i, j)) {
+                    if (!isInitalPoint(m_path[color][t]))
+                        m_arr[m_path[color][t].x()][m_path[color][t].y()] = 10000;
+                    m_path[color].pop_back();
+                }else
+                    break;
+            }
+            if (m_path[color].size() == 0) {
+                m_path[color].push_back(QPoint(i, j));
+            }
         }
     }
     this->update();
+    qDebug() << "End mousePressEvent";
 }
 
 void Widget::mouseReleaseEvent(QMouseEvent *event) {
