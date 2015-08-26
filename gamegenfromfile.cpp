@@ -5,3 +5,7 @@ GameGenFromFile::GameGenFromFile()
     
 }
 
+void GameGenFromFile::newGame(int size) {
+    
+}
+

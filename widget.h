@@ -2,8 +2,7 @@
 #define WIDGET_H
 
 #include <QWidget>
-
-class QFrame;
+#include "GameGen.h"
 
 namespace Ui {
 class Widget;
@@ -16,10 +15,16 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
+    
     void paintEvent(QPaintEvent *);
+    void setGameGen(GameGen *gen);
+    
+public slots:
+    void newGame(int);
+
 private:
     Ui::Widget *ui;
-    int m_size;
+    GameGen *m_gen;
     
 };
 

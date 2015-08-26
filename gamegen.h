@@ -6,6 +6,8 @@ class GameGen
 {
 public:
     GameGen();
+    
+    virtual void newGame(int) = 0;
 };
 
 #endif // GAMEGEN_H
