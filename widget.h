@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include "GameGen.h"
+#include <QPoint>
+#include <vector>
 
 namespace Ui {
 class Widget;
@@ -18,14 +20,30 @@ public:
     
     void paintEvent(QPaintEvent *);
     void setGameGen(GameGen *gen);
+    void mouseMoveEvent(QMouseEvent *);
+    void mousePressEvent(QMouseEvent *);
+    void mouseReleaseEvent(QMouseEvent *);
     
 public slots:
     void newGame(int);
 
 private:
+    int getX(int);
+    int getY(int);
+    bool getXY(int &, int &);
+    bool isInitalPoint(int, int);
+    bool isPathSource(int, int);
+    
     Ui::Widget *ui;
     GameGen *m_gen;
-    
+    int *m_x, *m_y;
+    int **m_arr;
+    int m_size, m_sizePrev;
+    int m_ltx, m_lty;
+    bool isMousePress;
+    int isDrawing;
+    int m_mx, m_my;
+    std::vector<QPoint> *m_path;
 };
 
 #endif // WIDGET_H

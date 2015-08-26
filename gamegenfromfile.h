@@ -8,7 +8,7 @@ class GameGenFromFile : public GameGen
 public:
     GameGenFromFile();
     
-    virtual void newGame(int);
+    virtual void newGame(int, int *&, int *&, int **&, int);
 };
 
 #endif // GAMEGENFROMFILE_H
