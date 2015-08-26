@@ -13,8 +13,14 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        widget.cpp
+        widget.cpp \
+    game.cpp \
+    gamegen.cpp \
+    gamegenfromfile.cpp
 
-HEADERS  += widget.h
+HEADERS  += widget.h \
+    game.h \
+    gamegen.h \
+    gamegenfromfile.h
 
 FORMS    += widget.ui
