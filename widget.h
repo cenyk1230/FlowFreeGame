@@ -3,6 +3,8 @@
 
 #include <QWidget>
 
+class QFrame;
+
 namespace Ui {
 class Widget;
 }
@@ -14,9 +16,11 @@ class Widget : public QWidget
 public:
     explicit Widget(QWidget *parent = 0);
     ~Widget();
-    
+    void paintEvent(QPaintEvent *);
 private:
     Ui::Widget *ui;
+    int m_size;
+    
 };
 
 #endif // WIDGET_H
