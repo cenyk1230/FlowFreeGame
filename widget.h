@@ -44,6 +44,7 @@ private:
     bool isInitalPoint(QPoint);
     bool isPathSource(int, int);
     bool isConnected(int);
+    void updateText();
     
     Ui::Widget *ui;
     GameGen *m_gen;
@@ -54,6 +55,7 @@ private:
     int m_ltx, m_lty;
     bool isMousePress;
     int isDrawing;
+    int m_move;
     int m_mx, m_my;
     QPushButton *prev, *next, *reStart;
     QLabel *flowLabel, *moveLabel, *pipeLabel;

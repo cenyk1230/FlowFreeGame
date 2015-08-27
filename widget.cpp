@@ -8,6 +8,7 @@
 #include <QString>
 #include <QDebug>
 #include <QMouseEvent>
+#include <QPalette>
 #include <vector>
 
 using namespace std;
@@ -21,9 +22,10 @@ Widget::Widget(QWidget *parent) :
     this->setFixedHeight(560);
     this->setFixedWidth(500);
     m_gen = NULL;
-    m_size = m_sizePrev = 5;
-    m_pairNum = 5;
+    m_size = m_sizePrev = 0;
+    m_pairNum = 0;
     m_num = 0;
+    m_move = 0;
     m_x = m_y = NULL;
     m_arr = NULL;
     m_path = NULL;
@@ -41,14 +43,35 @@ Widget::Widget(QWidget *parent) :
     flowEdit = new QLineEdit();
     moveEdit = new QLineEdit();
     pipeEdit = new QLineEdit();
+    flowEdit->setReadOnly(true);
+    moveEdit->setReadOnly(true);
+    pipeEdit->setReadOnly(true);
     
     QVBoxLayout *vt = new QVBoxLayout(this);
+    QHBoxLayout *ht1 = new QHBoxLayout();
+    vt->addLayout(ht1);
+    QPalette pe;
+    pe.setColor(QPalette::WindowText, Qt::white);
+    flowLabel->setPalette(pe);
+    moveLabel->setPalette(pe);
+    pipeLabel->setPalette(pe);
+    
+    ht1->addWidget(flowLabel);
+    ht1->addWidget(flowEdit);
+    ht1->addSpacing(50);
+    ht1->addWidget(moveLabel);
+    ht1->addWidget(moveEdit);
+    ht1->addSpacing(50);
+    ht1->addWidget(pipeLabel);
+    ht1->addWidget(pipeEdit);
+            
     vt->addStretch();
-    QHBoxLayout *ht = new QHBoxLayout();
-    vt->addLayout(ht);
-    ht->addWidget(prev);
-    ht->addWidget(reStart);
-    ht->addWidget(next);
+    
+    QHBoxLayout *ht2 = new QHBoxLayout();
+    vt->addLayout(ht2);
+    ht2->addWidget(prev);
+    ht2->addWidget(reStart);
+    ht2->addWidget(next);
     
     connect(reStart, SIGNAL(clicked(bool)), this, SLOT(reGame()));
     connect(prev, SIGNAL(clicked(bool)), this, SLOT(prevGame()));
@@ -166,7 +189,24 @@ void Widget::paintEvent(QPaintEvent *) {
             painter.drawRect(x - s / m_size / 2, y - s / m_size / 2, s / m_size, s / m_size);
         }
     }
+    updateText();
     qDebug() << "End Drawing" << endl;
+}
+
+void Widget::updateText() {
+    int connectedNum = 0;
+    for (int i = 0; i < m_pairNum; ++i)
+        if (isConnected(i))
+            ++connectedNum;
+    flowEdit->setText(QString::number(connectedNum) + "/" + QString::number(m_pairNum));
+    
+    moveEdit->setText(QString::number(m_move));
+    
+    int pipeNum = 0;
+    for (int i = 0; i < m_pairNum; ++i)
+        pipeNum += max((int)m_path[i].size() - 1, 0);
+    int per = (int)(pipeNum * 1.0 / (m_size * m_size - m_pairNum) * 100 + 0.5);
+    pipeEdit->setText(QString::number(per) + "%");
 }
 
 bool Widget::getXY(int &x, int &y) {
@@ -218,6 +258,7 @@ void Widget::newGame(int size) {
     m_path = new std::vector<QPoint>[m_pairNum];
     for (int i = 0; i < m_pairNum; ++i)
         m_path[i].clear();
+    m_move = 0;
     this->repaint();
     qDebug() << "End newGame";
 }
@@ -230,6 +271,7 @@ void Widget::reGame() {
             m_arr[i][j] = 10000;
     for (int i = 0; i < m_pairNum * 2; ++i)
         m_arr[m_x[i]][m_y[i]] = i / 2;
+    m_move = 0;
     this->repaint();
 }
 
@@ -314,6 +356,9 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
                 if (isInitalPoint(i, j) && !isPathSource(i, j)) {
                     m_arr[i][j] = isDrawing;
                     m_path[isDrawing].push_back(QPoint(i, j));
+                    
+                    mouseReleaseEvent(event);
+                    
                 }else {
                     while (m_path[isDrawing].size() > 0) {
                         int t = (int)m_path[isDrawing].size() - 1;
@@ -330,6 +375,7 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
             isDrawing = -1;
         }
     }
+    
     this->update();
     qDebug() << "End mouseMoveEvent";
 }
@@ -375,6 +421,8 @@ void Widget::mouseReleaseEvent(QMouseEvent *event) {
     m_mx = event->x();
     m_my = event->y();
     isMousePress = false;
+    if (isDrawing != -1)
+        ++m_move;
     isDrawing = -1;
     this->update();
 }
