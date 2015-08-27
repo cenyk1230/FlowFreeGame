@@ -39,6 +39,8 @@ Widget::Widget(QWidget *parent) :
     ht->addWidget(prev);
     ht->addWidget(reStart);
     ht->addWidget(next);
+    
+    connect(reStart, SIGNAL(clicked(bool)), this, SLOT(reGame()));
 }
 
 Widget::~Widget()
@@ -194,6 +196,17 @@ void Widget::newGame(int size) {
     m_path = new std::vector<QPoint>[m_size];
     for (int i = 0; i < m_size; ++i)
         m_path[i].clear();
+}
+
+void Widget::reGame() {
+    for (int i = 0; i < m_size; ++i)
+        m_path[i].clear();
+    for (int i = 0; i < m_size; ++i)
+        for (int j = 0; j < m_size; ++j)
+            m_arr[i][j] = 10000;
+    for (int i = 0; i < m_size * 2; ++i)
+        m_arr[m_x[i]][m_y[i]] = i / 2;
+    this->repaint();
 }
 
 void Widget::mouseMoveEvent(QMouseEvent *event) {

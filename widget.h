@@ -26,6 +26,7 @@ public:
     
 public slots:
     void newGame(int);
+    void reGame();
 
 private:
     int getX(int);
