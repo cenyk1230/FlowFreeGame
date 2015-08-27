@@ -11,6 +11,7 @@
 #include <QPalette>
 #include <QDialog>
 #include <QSignalMapper>
+#include <QMediaPlayer>
 #include <vector>
 
 using namespace std;
@@ -37,11 +38,11 @@ Widget::Widget(QWidget *parent) :
     isGameBegin = false;
     isDrawing = -1;
     
-    prev = new QPushButton("Prev", this);
-    next = new QPushButton("Next", this);
-    reStart = new QPushButton("ReStart", this);
-    choose = new QPushButton("Choose", this);
-    solution = new QPushButton("Solution", this);
+    prev = new QPushButton("上一关", this);
+    next = new QPushButton("下一关", this);
+    reStart = new QPushButton("重新开始", this);
+    choose = new QPushButton("选关", this);
+    solution = new QPushButton("显示解答", this);
     
     flowLabel = new QLabel("flows:");
     moveLabel = new QLabel("moves:");
@@ -71,7 +72,7 @@ Widget::Widget(QWidget *parent) :
     ht1->addSpacing(50);
     ht1->addWidget(pipeLabel);
     ht1->addWidget(pipeEdit);
-            
+    
     vt->addStretch();
     
     QHBoxLayout *ht2 = new QHBoxLayout();
@@ -104,6 +105,7 @@ Widget::Widget(QWidget *parent) :
         gt->addWidget(level6[i], 1, i + 1);
         gt->addWidget(level7[i], 2, i + 1);
     }
+    //chooseLevel->show();
     
     conDialog = new QDialog();
     conLabel = new QLabel("Congratulations!", conDialog);
@@ -111,10 +113,16 @@ Widget::Widget(QWidget *parent) :
     QVBoxLayout *cvt = new QVBoxLayout(conDialog);
     cvt->addWidget(conLabel);
     cvt->addWidget(conButton);
-    
     //conDialog->show();
     
-    //chooseLevel->show();
+    dingSound = new QMediaPlayer();
+    waterSound = new QMediaPlayer();
+
+    
+    dingSound->setMedia(QUrl::fromLocalFile("/Users/Roger/Qt/Projects/FlowFreeGame/ding.mov"));
+    dingSound->setVolume(30);
+    waterSound->setMedia(QUrl::fromLocalFile("/Users/Roger/Qt/Projects/FlowFreeGame/water.mov"));
+    waterSound->setVolume(60);
     
     connect(choose, SIGNAL(clicked(bool)), chooseDialog, SLOT(show()));
     connect(solution, SIGNAL(clicked(bool)), this, SLOT(solve()));
@@ -169,7 +177,15 @@ void Widget::paintEvent(QPaintEvent *) {
     if (m_gen == NULL)
         return;
     if (!isGameBegin) {
-        
+        painter.setPen(Qt::red);
+        painter.setFont(QFont("宋体", 100));
+        painter.drawText(60, 150, 200, 200, Qt::AlignHCenter|Qt::AlignVCenter, "f");
+        painter.setPen(Qt::green);
+        painter.drawText(100, 150, 200, 200, Qt::AlignHCenter|Qt::AlignVCenter, "l");
+        painter.setPen(Qt::blue);
+        painter.drawText(140, 150, 200, 200, Qt::AlignHCenter|Qt::AlignVCenter, "o");
+        painter.setPen(Qt::yellow);
+        painter.drawText(210, 150, 200, 200, Qt::AlignHCenter|Qt::AlignVCenter, "w");
         return;
     }
     /*m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev);
@@ -443,6 +459,8 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
                     isMousePress = false;
                     isDrawing = -1;
                 }else {
+                    if (isConnected(m_arr[i][j]))
+                        waterSound->play();
                     int color = m_arr[i][j];
                     while (m_path[color].size() > 0) {
                         int t = (int)m_path[color].size() - 1;
@@ -462,6 +480,8 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
                 }
             }else {
                 if (isInitalPoint(i, j) && !isPathSource(i, j)) {
+                    dingSound->play();
+                    
                     m_arr[i][j] = isDrawing;
                     m_path[isDrawing].push_back(QPoint(i, j));
                     

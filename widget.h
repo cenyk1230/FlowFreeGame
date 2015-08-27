@@ -9,6 +9,7 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMediaPlayer>
 
 namespace Ui {
 class Widget;
@@ -70,6 +71,7 @@ private:
     QDialog *chooseDialog, *conDialog;
     QLabel *label5, *label6, *label7, *conLabel;
     QPushButton *level5[3], *level6[3], *level7[3], *conButton;
+    QMediaPlayer *waterSound, *dingSound;
     std::vector<QPoint> *m_path;
 };
 
