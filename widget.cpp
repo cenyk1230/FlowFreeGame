@@ -29,6 +29,7 @@ Widget::Widget(QWidget *parent) :
     m_pairNum = 0;
     m_num = 0;
     m_move = 0;
+    m_connectedNum = 0;
     m_x = m_y = NULL;
     m_arr = NULL;
     m_path = NULL;
@@ -104,6 +105,15 @@ Widget::Widget(QWidget *parent) :
         gt->addWidget(level7[i], 2, i + 1);
     }
     
+    conDialog = new QDialog();
+    conLabel = new QLabel("Congratulations!", conDialog);
+    conButton = new QPushButton("OK", conDialog);
+    QVBoxLayout *cvt = new QVBoxLayout(conDialog);
+    cvt->addWidget(conLabel);
+    cvt->addWidget(conButton);
+    
+    //conDialog->show();
+    
     //chooseLevel->show();
     
     connect(choose, SIGNAL(clicked(bool)), chooseDialog, SLOT(show()));
@@ -111,6 +121,9 @@ Widget::Widget(QWidget *parent) :
     connect(reStart, SIGNAL(clicked(bool)), this, SLOT(reGame()));
     connect(prev, SIGNAL(clicked(bool)), this, SLOT(prevGame()));
     connect(next, SIGNAL(clicked(bool)), this, SLOT(nextGame()));
+    
+    connect(conButton, SIGNAL(clicked(bool)), conDialog, SLOT(hide()));
+    connect(this, SIGNAL(win()), conDialog, SLOT(show()));
     
     QSignalMapper *m = new QSignalMapper();
     
@@ -264,6 +277,11 @@ void Widget::updateText() {
         pipeNum += max((int)m_path[i].size() - 1, 0);
     int per = (int)(pipeNum * 1.0 / (m_size * m_size - m_pairNum) * 100 + 0.5);
     pipeEdit->setText(QString::number(per) + "%");
+    
+    if (connectedNum == m_pairNum && m_connectedNum < connectedNum) {
+        emit win();
+    }
+    m_connectedNum = connectedNum;
 }
 
 bool Widget::getXY(int &x, int &y) {
