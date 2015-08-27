@@ -13,15 +13,5 @@ int main(int argc, char *argv[])
     //w.newGame(5);
     w.show();
     
-    // test read
-    /*f("test.txt");
-    if (!f.open(QIODevice::ReadOnly)) {
-        qDebug() << "Can't read file";
-    }
-    int aa, bb;
-    QTextStream in(&f);
-    in >> aa >> bb;
-    qDebug() << aa << " " << bb;*/
-    
     return a.exec();
 }

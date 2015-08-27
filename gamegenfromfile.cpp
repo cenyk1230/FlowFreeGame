@@ -47,35 +47,3 @@ void GameGenFromFile::newGame(int size, int *&x, int *&y, int **&arr, int lastSi
     f.close();
     qDebug() << "End GameGenFromFile::newGame";
 }
-
-/*void GameGenFromFile::newGame() {
-    QString fileName = QString::number(m_size) + "_" + QString::number(m_num) + ".txt";
-    QFile f(fileName);
-    if (!f.open(QIODevice::ReadOnly)) {
-        qDebug() << "Can't read file";
-    }
-    QTextStream in(&f);
-    in >> pairNum;
-    for (int i = 0; i < m_size; ++i)
-        for (int j = 0; j < m_size; ++j)
-            m_arr[i][j] = 10000;
-    for (int i = 0; i < pairNum * 2; ++i) {
-        in >> x[i] >> y[i];
-        arr[x[i]][y[i]] = i / 2;
-    }
-    f.close();
-}
-
-void GameGenFromFile::nextGame() {
-    m_num += 1;
-    if (m_num >= 3)
-        m_num -= 3;
-    this->newGame();
-}
-
-void GameGenFromFile::prevGame() {
-    m_num -= 1;
-    if (m_num < 0)
-        m_num += 3;
-    this->newGame();
-}*/

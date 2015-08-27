@@ -11,15 +11,10 @@ class GameGenFromFile : public GameGen
     Q_OBJECT
 public:
     explicit GameGenFromFile(QObject *parent = 0);
-    ~GameGenFromFile() {}
-    
-    //virtual void newGame(int, int *&, int *&, int **&, int, int &, int);
-    //virtual void newGame();
+    ~GameGenFromFile() {} 
     
 public slots:
     virtual void newGame(int, int *&, int *&, int **&, int, int &, int);
-    //void nextGame();
-    //void prevGame();
     
 private:
     int m_size;
