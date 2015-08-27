@@ -60,6 +60,9 @@ private:
     QPushButton *prev, *next, *reStart;
     QLabel *flowLabel, *moveLabel, *pipeLabel;
     QLineEdit *flowEdit, *moveEdit, *pipeEdit;
+    QDialog *chooseLevel;
+    QLabel *label5, *label6, *label7;
+    QPushButton *level5[3], *level6[3], *level7[3];
     std::vector<QPoint> *m_path;
 };
 

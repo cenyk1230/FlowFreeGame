@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <QMouseEvent>
 #include <QPalette>
+#include <QDialog>
 #include <vector>
 
 using namespace std;
@@ -73,6 +74,31 @@ Widget::Widget(QWidget *parent) :
     ht2->addWidget(reStart);
     ht2->addWidget(next);
     
+    chooseLevel = new QDialog();
+    chooseLevel->setWindowTitle("Choose Level");
+    chooseLevel->setFixedHeight(160);
+    chooseLevel->setFixedWidth(240);
+    
+    for (int i = 0; i < 3; ++i) {
+        level5[i] = new QPushButton(QString::number(i + 1), chooseLevel);
+        level6[i] = new QPushButton(QString::number(i + 1), chooseLevel);
+        level7[i] = new QPushButton(QString::number(i + 1), chooseLevel);
+    }
+    label5 = new QLabel("5×5");
+    label6 = new QLabel("6×6");
+    label7 = new QLabel("7×7");
+    QGridLayout *gt = new QGridLayout(chooseLevel);
+    gt->addWidget(label5, 0, 0);
+    gt->addWidget(label6, 1, 0);
+    gt->addWidget(label7, 2, 0);
+    for (int i = 0; i < 3; ++i) {
+        gt->addWidget(level5[i], 0, i + 1);
+        gt->addWidget(level6[i], 1, i + 1);
+        gt->addWidget(level7[i], 2, i + 1);
+    }
+    
+    //chooseLevel->show();
+    
     connect(reStart, SIGNAL(clicked(bool)), this, SLOT(reGame()));
     connect(prev, SIGNAL(clicked(bool)), this, SLOT(prevGame()));
     connect(next, SIGNAL(clicked(bool)), this, SLOT(nextGame()));
@@ -101,9 +127,9 @@ void Widget::paintEvent(QPaintEvent *) {
     QPainter painter(this); 
     painter.setBrush(Qt::black);
     painter.drawRect(0, 0, width(), height());
-    /*if (m_gen == NULL)
+    if (m_gen == NULL)
         return;
-    m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev);
+    /*m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev);
     if (m_path != NULL)
         delete []m_path;
     m_path = new std::vector<QPoint>[m_size];*/
@@ -286,6 +312,7 @@ void Widget::prevGame() {
     m_path = new std::vector<QPoint>[m_pairNum];
     for (int i = 0; i < m_pairNum; ++i)
         m_path[i].clear();
+    m_move = 0;
     this->repaint();
     qDebug() << "End Widget::prevGame";
 }
@@ -301,6 +328,7 @@ void Widget::nextGame() {
     m_path = new std::vector<QPoint>[m_pairNum];
     for (int i = 0; i < m_pairNum; ++i)
         m_path[i].clear();
+    m_move = 0;
     this->repaint();
     qDebug() << "End Widget::nextGame";
 }
