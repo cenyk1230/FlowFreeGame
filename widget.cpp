@@ -24,6 +24,7 @@ Widget::Widget(QWidget *parent) :
     this->setFixedHeight(560);
     this->setFixedWidth(500);
     m_gen = NULL;
+    m_solver = new Solver();
     m_size = m_sizePrev = 0;
     m_pairNum = 0;
     m_num = 0;
@@ -106,7 +107,7 @@ Widget::Widget(QWidget *parent) :
     //chooseLevel->show();
     
     connect(choose, SIGNAL(clicked(bool)), chooseDialog, SLOT(show()));
-    
+    connect(solution, SIGNAL(clicked(bool)), this, SLOT(solve()));
     connect(reStart, SIGNAL(clicked(bool)), this, SLOT(reGame()));
     connect(prev, SIGNAL(clicked(bool)), this, SLOT(prevGame()));
     connect(next, SIGNAL(clicked(bool)), this, SLOT(nextGame()));
@@ -221,15 +222,16 @@ void Widget::paintEvent(QPaintEvent *) {
             int y1 = getY(m_path[i][j].y());
             int x2 = getX(m_path[i][j + 1].x());
             int y2 = getY(m_path[i][j + 1].y());
-            painter.drawEllipse(QPoint(x2, y2), 12, 12);
+            int r = s / m_size / 2 * 0.28;
+            painter.drawEllipse(QPoint(x2, y2), r, r);
             if (x1 == x2) {
                 if (y1 > y2)
                     swap(y1, y2);
-                painter.drawRect(x1 - 12, y1, 24, y2 - y1);
+                painter.drawRect(x1 - r, y1, r * 2, y2 - y1);
             }else {
                 if (x1 > x2)
                     swap(x1, x2);
-                painter.drawRect(x1, y1 - 12, x2 - x1, 24);
+                painter.drawRect(x1, y1 - r, x2 - x1, r * 2);
             }
         }
         if (i == hiddenColor)
@@ -377,6 +379,20 @@ void Widget::chooseLevel(QString st) {
     m_move = 0;
     qDebug() << m_size << " " << m_num << " " << m_pairNum;
     qDebug() << "End chooseLevel";
+}
+
+void Widget::solve() {
+    if (isGameBegin) {
+        bool isSolve = m_solver->solve(m_size, m_x, m_y, m_arr, m_path, m_pairNum);
+        if (isSolve) {
+            m_move = m_pairNum;
+            this->repaint();
+        }else {
+            qDebug() << "Can't solve";
+        }
+    }else {
+        qDebug() << "Can't solve because the game doesn't begin.";
+    }
 }
 
 void Widget::mouseMoveEvent(QMouseEvent *event) {

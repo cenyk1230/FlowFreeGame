@@ -11,7 +11,7 @@ public:
     ~GameGen() {}
     
 public slots:
-    virtual void newGame(int, int *&, int *&, int **&, int, int &, int);
+    virtual void newGame(int, int *&, int *&, int **&, int, int &, int) = 0;
 signals:
     
 };

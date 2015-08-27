@@ -3,6 +3,7 @@
 
 #include <QWidget>
 #include "gamegen.h"
+#include "solver.h"
 #include <QPoint>
 #include <vector>
 #include <QPushButton>
@@ -33,6 +34,7 @@ public slots:
     void prevGame();
     void nextGame();
     void chooseLevel(QString);
+    void solve();
 
 signals:
     void newGame(int, int *&, int *&, int **&, int, int &, int);
@@ -49,6 +51,7 @@ private:
     
     Ui::Widget *ui;
     GameGen *m_gen;
+    Solver *m_solver;
     int *m_x, *m_y;
     int **m_arr;
     int m_size, m_sizePrev, m_pairNum;

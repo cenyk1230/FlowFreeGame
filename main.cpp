@@ -10,7 +10,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     Widget w;
     w.setGameGen(new GameGenFromFile);
-    w.newGame(5);
+    //w.newGame(5);
     w.show();
     
     // test read
