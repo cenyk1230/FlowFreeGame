@@ -2,9 +2,12 @@
 #define WIDGET_H
 
 #include <QWidget>
-#include "GameGen.h"
+#include "gamegen.h"
 #include <QPoint>
 #include <vector>
+#include <QPushButton>
+#include <QLabel>
+#include <QLineEdit>
 
 namespace Ui {
 class Widget;
@@ -27,6 +30,11 @@ public:
 public slots:
     void newGame(int);
     void reGame();
+    void prevGame();
+    void nextGame();
+
+signals:
+    void newGame(int, int *&, int *&, int **&, int, int &, int);
 
 private:
     int getX(int);
@@ -42,10 +50,14 @@ private:
     int *m_x, *m_y;
     int **m_arr;
     int m_size, m_sizePrev, m_pairNum;
+    int m_num;
     int m_ltx, m_lty;
     bool isMousePress;
     int isDrawing;
     int m_mx, m_my;
+    QPushButton *prev, *next, *reStart;
+    QLabel *flowLabel, *moveLabel, *pipeLabel;
+    QLineEdit *flowEdit, *moveEdit, *pipeEdit;
     std::vector<QPoint> *m_path;
 };
 

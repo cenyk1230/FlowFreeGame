@@ -1,13 +1,19 @@
 #ifndef GAMEGEN_H
 #define GAMEGEN_H
 
+#include <QObject>
 
-class GameGen
+class GameGen : public QObject
 {
+    Q_OBJECT
 public:
-    GameGen();
+    explicit GameGen(QObject *parent = 0);
+    ~GameGen() {}
     
-    virtual void newGame(int, int *&, int *&, int **&, int, int &) = 0;
+public slots:
+    virtual void newGame(int, int *&, int *&, int **&, int, int &, int);
+signals:
+    
 };
 
 #endif // GAMEGEN_H

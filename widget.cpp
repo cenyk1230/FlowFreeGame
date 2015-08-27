@@ -18,20 +18,29 @@ Widget::Widget(QWidget *parent) :
 {
     ui->setupUi(this);
     this->setWindowTitle("Flow Free Game");
-    this->setFixedHeight(500);
+    this->setFixedHeight(560);
     this->setFixedWidth(500);
     m_gen = NULL;
     m_size = m_sizePrev = 5;
     m_pairNum = 5;
+    m_num = 0;
     m_x = m_y = NULL;
     m_arr = NULL;
     m_path = NULL;
     isMousePress = false;
     isDrawing = -1;
     
-    QPushButton *prev = new QPushButton("Prev", this);
-    QPushButton *next = new QPushButton("Next", this);
-    QPushButton *reStart = new QPushButton("ReStart", this);
+    prev = new QPushButton("Prev", this);
+    next = new QPushButton("Next", this);
+    reStart = new QPushButton("ReStart", this);
+    
+    flowLabel = new QLabel("flows:");
+    moveLabel = new QLabel("moves:");
+    pipeLabel = new QLabel("pipe:");
+    
+    flowEdit = new QLineEdit();
+    moveEdit = new QLineEdit();
+    pipeEdit = new QLineEdit();
     
     QVBoxLayout *vt = new QVBoxLayout(this);
     vt->addStretch();
@@ -42,6 +51,8 @@ Widget::Widget(QWidget *parent) :
     ht->addWidget(next);
     
     connect(reStart, SIGNAL(clicked(bool)), this, SLOT(reGame()));
+    connect(prev, SIGNAL(clicked(bool)), this, SLOT(prevGame()));
+    connect(next, SIGNAL(clicked(bool)), this, SLOT(nextGame()));
 }
 
 Widget::~Widget()
@@ -82,7 +93,7 @@ void Widget::paintEvent(QPaintEvent *) {
     h -= 50;
     int s = 420;
     m_ltx = w / 2 - s / 2;
-    m_lty = h / 2 - s / 2;
+    m_lty = h / 2 - s / 2 + 20;
     painter.setPen(Qt::yellow);
     //painter.drawRect(cX - s / 2, cY - s / 2, s, s);
     for (int i = 0; i <= m_size; ++i) {
@@ -179,25 +190,36 @@ bool Widget::getXY(int &x, int &y) {
 }
 
 void Widget::setGameGen(GameGen *gen) {
-    if (m_gen != NULL)
+    qDebug() << "Begin setGameGen";
+    if (m_gen != NULL) {
+        disconnect(this, SIGNAL(newGame(int, int *&, int *&, int **&, int, int &, int)), this->m_gen, SLOT(newGame(int, int *&, int *&, int **&, int, int &, int)));
+        disconnect(this, SIGNAL(newGame(int, int *&, int *&, int **&, int, int &, int)), this->m_gen, SLOT(newGame(int, int *&, int *&, int **&, int, int &, int)));
         delete m_gen;
+    }
     m_gen = gen;
+    
+    connect(this, SIGNAL(newGame(int, int *&, int *&, int **&, int, int &, int)), this->m_gen, SLOT(newGame(int, int *&, int *&, int **&, int, int &, int)));
+    connect(this, SIGNAL(newGame(int, int *&, int *&, int **&, int, int &, int)), this->m_gen, SLOT(newGame(int, int *&, int *&, int **&, int, int &, int)));
+    qDebug() << "End setGameGen";
 }
 
 
 void Widget::newGame(int size) {
+    qDebug() << "Begin newGame";
     if (m_gen == NULL) {
         qDebug() << "can't new game";
         return;
     }
     m_sizePrev = m_size;
     m_size = size;
-    m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum);
+    m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
     if (m_path != NULL)
         delete []m_path;
     m_path = new std::vector<QPoint>[m_pairNum];
     for (int i = 0; i < m_pairNum; ++i)
         m_path[i].clear();
+    this->repaint();
+    qDebug() << "End newGame";
 }
 
 void Widget::reGame() {
@@ -209,6 +231,36 @@ void Widget::reGame() {
     for (int i = 0; i < m_pairNum * 2; ++i)
         m_arr[m_x[i]][m_y[i]] = i / 2;
     this->repaint();
+}
+
+void Widget::prevGame() {
+    qDebug() << "Begin Widget::prevGame";
+    m_num -= 1;
+    if (m_num < 0)
+        m_num += 3;
+    emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
+    if (m_path != NULL)
+        delete []m_path;
+    m_path = new std::vector<QPoint>[m_pairNum];
+    for (int i = 0; i < m_pairNum; ++i)
+        m_path[i].clear();
+    this->repaint();
+    qDebug() << "End Widget::prevGame";
+}
+
+void Widget::nextGame() {
+    qDebug() << "Begin Widget::nextGame";
+    m_num += 1;
+    if (m_num >= 3)
+        m_num -= 3;
+    emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
+    if (m_path != NULL)
+        delete []m_path;
+    m_path = new std::vector<QPoint>[m_pairNum];
+    for (int i = 0; i < m_pairNum; ++i)
+        m_path[i].clear();
+    this->repaint();
+    qDebug() << "End Widget::nextGame";
 }
 
 void Widget::mouseMoveEvent(QMouseEvent *event) {
