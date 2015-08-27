@@ -10,6 +10,7 @@
 #include <QMouseEvent>
 #include <QPalette>
 #include <QDialog>
+#include <QSignalMapper>
 #include <vector>
 
 using namespace std;
@@ -31,11 +32,14 @@ Widget::Widget(QWidget *parent) :
     m_arr = NULL;
     m_path = NULL;
     isMousePress = false;
+    isGameBegin = false;
     isDrawing = -1;
     
     prev = new QPushButton("Prev", this);
     next = new QPushButton("Next", this);
     reStart = new QPushButton("ReStart", this);
+    choose = new QPushButton("Choose", this);
+    solution = new QPushButton("Solution", this);
     
     flowLabel = new QLabel("flows:");
     moveLabel = new QLabel("moves:");
@@ -71,23 +75,25 @@ Widget::Widget(QWidget *parent) :
     QHBoxLayout *ht2 = new QHBoxLayout();
     vt->addLayout(ht2);
     ht2->addWidget(prev);
+    ht2->addWidget(choose);
     ht2->addWidget(reStart);
+    ht2->addWidget(solution);
     ht2->addWidget(next);
     
-    chooseLevel = new QDialog();
-    chooseLevel->setWindowTitle("Choose Level");
-    chooseLevel->setFixedHeight(160);
-    chooseLevel->setFixedWidth(240);
+    chooseDialog = new QDialog();
+    chooseDialog->setWindowTitle("Choose Level");
+    chooseDialog->setFixedHeight(160);
+    chooseDialog->setFixedWidth(240);
     
     for (int i = 0; i < 3; ++i) {
-        level5[i] = new QPushButton(QString::number(i + 1), chooseLevel);
-        level6[i] = new QPushButton(QString::number(i + 1), chooseLevel);
-        level7[i] = new QPushButton(QString::number(i + 1), chooseLevel);
+        level5[i] = new QPushButton(QString::number(i + 1), chooseDialog);
+        level6[i] = new QPushButton(QString::number(i + 1), chooseDialog);
+        level7[i] = new QPushButton(QString::number(i + 1), chooseDialog);
     }
     label5 = new QLabel("5×5");
     label6 = new QLabel("6×6");
     label7 = new QLabel("7×7");
-    QGridLayout *gt = new QGridLayout(chooseLevel);
+    QGridLayout *gt = new QGridLayout(chooseDialog);
     gt->addWidget(label5, 0, 0);
     gt->addWidget(label6, 1, 0);
     gt->addWidget(label7, 2, 0);
@@ -99,9 +105,28 @@ Widget::Widget(QWidget *parent) :
     
     //chooseLevel->show();
     
+    connect(choose, SIGNAL(clicked(bool)), chooseDialog, SLOT(show()));
+    
     connect(reStart, SIGNAL(clicked(bool)), this, SLOT(reGame()));
     connect(prev, SIGNAL(clicked(bool)), this, SLOT(prevGame()));
     connect(next, SIGNAL(clicked(bool)), this, SLOT(nextGame()));
+    
+    QSignalMapper *m = new QSignalMapper();
+    
+    for (int i = 0; i < 3; ++i) {
+        connect(level5[i], SIGNAL(clicked(bool)), chooseDialog, SLOT(hide()));
+        connect(level6[i], SIGNAL(clicked(bool)), chooseDialog, SLOT(hide()));
+        connect(level7[i], SIGNAL(clicked(bool)), chooseDialog, SLOT(hide()));
+        
+        connect(level5[i], SIGNAL(clicked(bool)), m, SLOT(map()));
+        connect(level6[i], SIGNAL(clicked(bool)), m, SLOT(map()));
+        connect(level7[i], SIGNAL(clicked(bool)), m, SLOT(map()));
+        
+        m->setMapping(level5[i], "5_" + QString::number(i));
+        m->setMapping(level6[i], "6_" + QString::number(i));
+        m->setMapping(level7[i], "7_" + QString::number(i));
+    }
+    connect(m, SIGNAL(mapped(QString)), this, SLOT(chooseLevel(QString)));
 }
 
 Widget::~Widget()
@@ -129,6 +154,10 @@ void Widget::paintEvent(QPaintEvent *) {
     painter.drawRect(0, 0, width(), height());
     if (m_gen == NULL)
         return;
+    if (!isGameBegin) {
+        
+        return;
+    }
     /*m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev);
     if (m_path != NULL)
         delete []m_path;
@@ -259,12 +288,10 @@ void Widget::setGameGen(GameGen *gen) {
     qDebug() << "Begin setGameGen";
     if (m_gen != NULL) {
         disconnect(this, SIGNAL(newGame(int, int *&, int *&, int **&, int, int &, int)), this->m_gen, SLOT(newGame(int, int *&, int *&, int **&, int, int &, int)));
-        disconnect(this, SIGNAL(newGame(int, int *&, int *&, int **&, int, int &, int)), this->m_gen, SLOT(newGame(int, int *&, int *&, int **&, int, int &, int)));
         delete m_gen;
     }
     m_gen = gen;
     
-    connect(this, SIGNAL(newGame(int, int *&, int *&, int **&, int, int &, int)), this->m_gen, SLOT(newGame(int, int *&, int *&, int **&, int, int &, int)));
     connect(this, SIGNAL(newGame(int, int *&, int *&, int **&, int, int &, int)), this->m_gen, SLOT(newGame(int, int *&, int *&, int **&, int, int &, int)));
     qDebug() << "End setGameGen";
 }
@@ -276,6 +303,7 @@ void Widget::newGame(int size) {
         qDebug() << "can't new game";
         return;
     }
+    isGameBegin = true;
     m_sizePrev = m_size;
     m_size = size;
     m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
@@ -331,6 +359,24 @@ void Widget::nextGame() {
     m_move = 0;
     this->repaint();
     qDebug() << "End Widget::nextGame";
+}
+
+void Widget::chooseLevel(QString st) {
+    qDebug() << "Begin chooseLevel";
+    const char *p = st.toStdString().data();
+    m_sizePrev = m_size;
+    m_size = p[0] - '0';
+    m_num = p[2] - '0';
+    isGameBegin = true;
+    emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
+    if (m_path != NULL)
+        delete []m_path;
+    m_path = new std::vector<QPoint>[m_pairNum];
+    for (int i = 0; i < m_pairNum; ++i)
+        m_path[i].clear();
+    m_move = 0;
+    qDebug() << m_size << " " << m_num << " " << m_pairNum;
+    qDebug() << "End chooseLevel";
 }
 
 void Widget::mouseMoveEvent(QMouseEvent *event) {

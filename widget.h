@@ -32,6 +32,7 @@ public slots:
     void reGame();
     void prevGame();
     void nextGame();
+    void chooseLevel(QString);
 
 signals:
     void newGame(int, int *&, int *&, int **&, int, int &, int);
@@ -54,13 +55,14 @@ private:
     int m_num;
     int m_ltx, m_lty;
     bool isMousePress;
+    bool isGameBegin;
     int isDrawing;
     int m_move;
     int m_mx, m_my;
-    QPushButton *prev, *next, *reStart;
+    QPushButton *prev, *next, *reStart, *choose, *solution;
     QLabel *flowLabel, *moveLabel, *pipeLabel;
     QLineEdit *flowEdit, *moveEdit, *pipeEdit;
-    QDialog *chooseLevel;
+    QDialog *chooseDialog;
     QLabel *label5, *label6, *label7;
     QPushButton *level5[3], *level6[3], *level7[3];
     std::vector<QPoint> *m_path;
