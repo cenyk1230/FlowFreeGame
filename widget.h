@@ -41,7 +41,7 @@ private:
     GameGen *m_gen;
     int *m_x, *m_y;
     int **m_arr;
-    int m_size, m_sizePrev;
+    int m_size, m_sizePrev, m_pairNum;
     int m_ltx, m_lty;
     bool isMousePress;
     int isDrawing;

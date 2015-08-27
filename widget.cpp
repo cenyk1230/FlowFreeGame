@@ -22,6 +22,7 @@ Widget::Widget(QWidget *parent) :
     this->setFixedWidth(500);
     m_gen = NULL;
     m_size = m_sizePrev = 5;
+    m_pairNum = 5;
     m_x = m_y = NULL;
     m_arr = NULL;
     m_path = NULL;
@@ -73,7 +74,7 @@ void Widget::paintEvent(QPaintEvent *) {
         delete []m_path;
     m_path = new std::vector<QPoint>[m_size];*/
     
-    //for (int i = 0; i < m_size * 2; ++i) {
+    //for (int i = 0; i < m_pairNum * 2; ++i) {
     //    qDebug() << m_x[i] << " " << m_y[i];
     //}
     int w = width();
@@ -95,7 +96,7 @@ void Widget::paintEvent(QPaintEvent *) {
             painter.setBrush(cc[(i + j) % 7]);
             painter.drawEllipse(QPoint(x, y), 420 / m_size / 2 - 10, 420 / m_size / 2 - 10);
         }*/
-    for (int i = 0; i < m_size; ++i) {
+    for (int i = 0; i < m_pairNum; ++i) {
         for (int j = 0; j < 2; ++j) {
             int x = getX(m_x[i * 2 + j]), y = getY(m_y[i * 2 + j]);
             painter.setPen(cc[i % ColorNum]);
@@ -122,7 +123,7 @@ void Widget::paintEvent(QPaintEvent *) {
     }else {
         isDrawing = -1;
     }
-    for (int i = 0; i < m_size; ++i) {
+    for (int i = 0; i < m_pairNum; ++i) {
         qDebug() << m_path[i].size();
         for (int j = 0; j < (int)m_path[i].size() - 1; ++j) {
             painter.setPen(cc[m_arr[m_path[i][j].x()][m_path[i][j].y()]]);
@@ -183,6 +184,7 @@ void Widget::setGameGen(GameGen *gen) {
     m_gen = gen;
 }
 
+
 void Widget::newGame(int size) {
     if (m_gen == NULL) {
         qDebug() << "can't new game";
@@ -190,21 +192,21 @@ void Widget::newGame(int size) {
     }
     m_sizePrev = m_size;
     m_size = size;
-    m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev);
+    m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum);
     if (m_path != NULL)
         delete []m_path;
-    m_path = new std::vector<QPoint>[m_size];
-    for (int i = 0; i < m_size; ++i)
+    m_path = new std::vector<QPoint>[m_pairNum];
+    for (int i = 0; i < m_pairNum; ++i)
         m_path[i].clear();
 }
 
 void Widget::reGame() {
-    for (int i = 0; i < m_size; ++i)
+    for (int i = 0; i < m_pairNum; ++i)
         m_path[i].clear();
     for (int i = 0; i < m_size; ++i)
         for (int j = 0; j < m_size; ++j)
             m_arr[i][j] = 10000;
-    for (int i = 0; i < m_size * 2; ++i)
+    for (int i = 0; i < m_pairNum * 2; ++i)
         m_arr[m_x[i]][m_y[i]] = i / 2;
     this->repaint();
 }
@@ -326,7 +328,7 @@ void Widget::mouseReleaseEvent(QMouseEvent *event) {
 }
 
 bool Widget::isInitalPoint(int x, int y) {
-    for (int i = 0; i < m_size * 2; ++i)
+    for (int i = 0; i < m_pairNum * 2; ++i)
         if (m_x[i] == x && m_y[i] == y)
             return true;
     return false;
@@ -337,7 +339,7 @@ bool Widget::isInitalPoint(QPoint p) {
 }
 
 bool Widget::isPathSource(int x, int y) {
-    for (int i = 0; i < m_size; ++i)
+    for (int i = 0; i < m_pairNum; ++i)
         if (m_path[i].size() > 0) {
             if (m_path[i][0].x() == x && m_path[i][0].y() == y)
                 return true;
