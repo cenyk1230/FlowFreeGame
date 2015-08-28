@@ -13,6 +13,8 @@
 #include <QSignalMapper>
 #include <QMediaPlayer>
 #include <vector>
+#include "gamegenfromfile.h"
+#include "gamegenrandom.h"
 
 using namespace std;
 
@@ -86,16 +88,17 @@ Widget::Widget(QWidget *parent) :
     chooseDialog = new QDialog();
     chooseDialog->setWindowTitle("Choose Level");
     chooseDialog->setFixedHeight(160);
-    chooseDialog->setFixedWidth(240);
+    chooseDialog->setFixedWidth(300);
     
     for (int i = 0; i < 3; ++i) {
         level5[i] = new QPushButton(QString::number(i + 1), chooseDialog);
         level6[i] = new QPushButton(QString::number(i + 1), chooseDialog);
         level7[i] = new QPushButton(QString::number(i + 1), chooseDialog);
+        randomButton[i] = new QPushButton("Random", chooseDialog);
     }
-    label5 = new QLabel("5×5");
-    label6 = new QLabel("6×6");
-    label7 = new QLabel("7×7");
+    label5 = new QLabel("5×5:");
+    label6 = new QLabel("6×6:");
+    label7 = new QLabel("7×7:");
     QGridLayout *gt = new QGridLayout(chooseDialog);
     gt->addWidget(label5, 0, 0);
     gt->addWidget(label6, 1, 0);
@@ -104,6 +107,7 @@ Widget::Widget(QWidget *parent) :
         gt->addWidget(level5[i], 0, i + 1);
         gt->addWidget(level6[i], 1, i + 1);
         gt->addWidget(level7[i], 2, i + 1);
+        gt->addWidget(randomButton[i], i, 4);
     }
     //chooseLevel->show();
     
@@ -139,14 +143,17 @@ Widget::Widget(QWidget *parent) :
         connect(level5[i], SIGNAL(clicked(bool)), chooseDialog, SLOT(hide()));
         connect(level6[i], SIGNAL(clicked(bool)), chooseDialog, SLOT(hide()));
         connect(level7[i], SIGNAL(clicked(bool)), chooseDialog, SLOT(hide()));
+        connect(randomButton[i], SIGNAL(clicked(bool)), chooseDialog, SLOT(hide()));
         
         connect(level5[i], SIGNAL(clicked(bool)), m, SLOT(map()));
         connect(level6[i], SIGNAL(clicked(bool)), m, SLOT(map()));
         connect(level7[i], SIGNAL(clicked(bool)), m, SLOT(map()));
+        connect(randomButton[i], SIGNAL(clicked(bool)), m, SLOT(map()));
         
         m->setMapping(level5[i], "5_" + QString::number(i));
         m->setMapping(level6[i], "6_" + QString::number(i));
         m->setMapping(level7[i], "7_" + QString::number(i));
+        m->setMapping(randomButton[i], QString::number(i + 5) + "_r");
     }
     connect(m, SIGNAL(mapped(QString)), this, SLOT(chooseLevel(QString)));
 }
@@ -174,8 +181,6 @@ void Widget::paintEvent(QPaintEvent *) {
     QPainter painter(this); 
     painter.setBrush(Qt::black);
     painter.drawRect(0, 0, width(), height());
-    if (m_gen == NULL)
-        return;
     if (!isGameBegin) {
         painter.setPen(Qt::red);
         painter.setFont(QFont("宋体", 100));
@@ -188,6 +193,8 @@ void Widget::paintEvent(QPaintEvent *) {
         painter.drawText(210, 150, 200, 200, Qt::AlignHCenter|Qt::AlignVCenter, "w");
         return;
     }
+    if (m_gen == NULL)
+        return;
     /*m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev);
     if (m_path != NULL)
         delete []m_path;
@@ -294,7 +301,7 @@ void Widget::updateText() {
     int per = (int)(pipeNum * 1.0 / (m_size * m_size - m_pairNum) * 100 + 0.5);
     pipeEdit->setText(QString::number(per) + "%");
     
-    if (connectedNum == m_pairNum && m_connectedNum < connectedNum) {
+    if (connectedNum == m_pairNum && m_connectedNum < connectedNum && pipeNum == m_size * m_size - m_pairNum) {
         emit win();
     }
     m_connectedNum = connectedNum;
@@ -367,33 +374,44 @@ void Widget::reGame() {
 
 void Widget::prevGame() {
     qDebug() << "Begin Widget::prevGame";
-    m_num -= 1;
-    if (m_num < 0)
-        m_num += 3;
-    emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
+    if (m_num == 'r' - '0') {
+        chooseLevel(QString::number(m_size) + "_r");
+    }else {
+        m_num -= 1;
+        if (m_num < 0)
+            m_num += 3;
+        chooseLevel(QString::number(m_size) + "_" + QString::number(m_num));
+    }
+    /*emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
     if (m_path != NULL)
         delete []m_path;
     m_path = new std::vector<QPoint>[m_pairNum];
     for (int i = 0; i < m_pairNum; ++i)
         m_path[i].clear();
     m_move = 0;
-    this->repaint();
+    this->repaint();*/
     qDebug() << "End Widget::prevGame";
 }
 
 void Widget::nextGame() {
     qDebug() << "Begin Widget::nextGame";
-    m_num += 1;
-    if (m_num >= 3)
-        m_num -= 3;
-    emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
+    if (m_num == 'r' - '0') {
+        chooseLevel(QString::number(m_size) + "_r");
+    }else {
+        m_num += 1;
+        if (m_num >= 3)
+            m_num -= 3;
+        chooseLevel(QString::number(m_size) + "_" + QString::number(m_num));
+    }
+    /*emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
     if (m_path != NULL)
         delete []m_path;
     m_path = new std::vector<QPoint>[m_pairNum];
     for (int i = 0; i < m_pairNum; ++i)
         m_path[i].clear();
     m_move = 0;
-    this->repaint();
+    this->repaint();*/
+    
     qDebug() << "End Widget::nextGame";
 }
 
@@ -404,13 +422,36 @@ void Widget::chooseLevel(QString st) {
     m_size = p[0] - '0';
     m_num = p[2] - '0';
     isGameBegin = true;
-    emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
+    if (m_num <= 9) {
+        setGameGen(new GameGenFromFile());
+        emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
+    }else {
+        setGameGen(new GameGenRandom());
+        do{
+            qDebug() << "Before newGame ...";
+            emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
+            qDebug() << "End newGame ...";
+            m_sizePrev = m_size;
+            if (m_path != NULL)
+                delete []m_path;
+            m_path = new std::vector<QPoint>[m_pairNum];
+            for (int i = 0; i < m_pairNum; ++i)
+                m_path[i].clear();
+        }while (!m_solver->solve(m_size, m_x, m_y, m_arr, m_path, m_pairNum));
+        for (int i = 0; i < m_size; ++i)
+            for (int j = 0; j < m_size; ++j)
+                m_arr[i][j] = 10000;
+        for (int i = 0; i < m_pairNum * 2; ++i) {
+            m_arr[m_x[i]][m_y[i]] = i / 2;
+        }
+    }
     if (m_path != NULL)
         delete []m_path;
     m_path = new std::vector<QPoint>[m_pairNum];
     for (int i = 0; i < m_pairNum; ++i)
         m_path[i].clear();
     m_move = 0;
+    this->repaint();
     qDebug() << m_size << " " << m_num << " " << m_pairNum;
     qDebug() << "End chooseLevel";
 }

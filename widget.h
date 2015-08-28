@@ -70,7 +70,7 @@ private:
     QLineEdit *flowEdit, *moveEdit, *pipeEdit;
     QDialog *chooseDialog, *conDialog;
     QLabel *label5, *label6, *label7, *conLabel;
-    QPushButton *level5[3], *level6[3], *level7[3], *conButton;
+    QPushButton *level5[3], *level6[3], *level7[3], *conButton, *randomButton[3];
     QMediaPlayer *waterSound, *dingSound;
     std::vector<QPoint> *m_path;
 };

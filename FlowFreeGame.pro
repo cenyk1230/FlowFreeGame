@@ -16,12 +16,14 @@ SOURCES += main.cpp\
         widget.cpp \
     gamegen.cpp \
     gamegenfromfile.cpp \
-    solver.cpp
+    solver.cpp \
+    gamegenrandom.cpp
 
 HEADERS  += widget.h \
     gamegen.h \
     gamegenfromfile.h \
-    solver.h
+    solver.h \
+    gamegenrandom.h
 
 FORMS    += widget.ui
 
