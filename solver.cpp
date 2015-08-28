@@ -51,7 +51,7 @@ bool bfs(int sx, int sy, int tx, int ty) {
     return false;
 }
 
-bool isValid(int dep) {
+bool isValid(int dep, int x, int y) {
     for (int i = dep + 1; i < pairNum; ++i)
         if (!bfs(X[i * 2], Y[i * 2], X[i * 2 + 1], Y[i * 2 + 1]))
             return false;
@@ -71,7 +71,7 @@ bool isValid(int dep) {
             for (int k = 0; k < 4; ++k) {
                 int ni = i + dx[k];
                 int nj = j + dy[k];
-                if (ni < 0 || ni >= size || nj < 0 || nj >= size || (a[ni][nj] != 10000 && a[ni][nj] < dep))
+                if (ni < 0 || ni >= size || nj < 0 || nj >= size || (a[ni][nj] != 10000 && a[ni][nj] <= dep && (ni != x || nj != y)))
                     continue;
                 ++num;
             }
@@ -83,7 +83,7 @@ bool isValid(int dep) {
 
 bool dfs(int dep, int x, int y) {
     //qDebug() << dep << " " << x << " " << y;
-    if (!isValid(dep)) {
+    if (!isValid(dep, x, y)) {
         return false;
     }
     

@@ -419,6 +419,7 @@ void Widget::solve() {
     if (isGameBegin) {
         bool isSolve = m_solver->solve(m_size, m_x, m_y, m_arr, m_path, m_pairNum);
         if (isSolve) {
+            m_connectedNum = m_pairNum;
             m_move = m_pairNum;
             this->repaint();
         }else {
