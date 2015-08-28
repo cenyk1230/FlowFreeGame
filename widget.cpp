@@ -379,6 +379,9 @@ void Widget::reGame() {
 
 void Widget::prevGame() {
     qDebug() << "Begin Widget::prevGame";
+    if (!isGameBegin) {
+        return;
+    }
     if (m_num == 'r' - '0') {
         chooseLevel(QString::number(m_size) + "_r");
     }else {
@@ -400,6 +403,9 @@ void Widget::prevGame() {
 
 void Widget::nextGame() {
     qDebug() << "Begin Widget::nextGame";
+    if (!isGameBegin) {
+        return;
+    }
     if (m_num == 'r' - '0') {
         chooseLevel(QString::number(m_size) + "_r");
     }else {
