@@ -87,8 +87,8 @@ Widget::Widget(QWidget *parent) :
     
     chooseDialog = new QDialog();
     chooseDialog->setWindowTitle("Choose Level");
-    chooseDialog->setFixedHeight(160);
-    chooseDialog->setFixedWidth(300);
+    chooseDialog->setFixedHeight(190);
+    chooseDialog->setFixedWidth(320);
     
     for (int i = 0; i < 3; ++i) {
         level5[i] = new QPushButton(QString::number(i + 1), chooseDialog);
@@ -99,7 +99,11 @@ Widget::Widget(QWidget *parent) :
     label5 = new QLabel("5×5:");
     label6 = new QLabel("6×6:");
     label7 = new QLabel("7×7:");
-    QGridLayout *gt = new QGridLayout(chooseDialog);
+    tipLabel = new QLabel("Tip: Random按钮生成的是随机有解的关卡");
+    QVBoxLayout *vt2 = new QVBoxLayout(chooseDialog);
+    QGridLayout *gt = new QGridLayout();
+    vt2->addLayout(gt);
+    vt2->addWidget(tipLabel);
     gt->addWidget(label5, 0, 0);
     gt->addWidget(label6, 1, 0);
     gt->addWidget(label7, 2, 0);
@@ -109,6 +113,7 @@ Widget::Widget(QWidget *parent) :
         gt->addWidget(level7[i], 2, i + 1);
         gt->addWidget(randomButton[i], i, 4);
     }
+    
     //chooseLevel->show();
     
     conDialog = new QDialog();
