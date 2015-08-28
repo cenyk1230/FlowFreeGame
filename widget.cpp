@@ -99,7 +99,7 @@ Widget::Widget(QWidget *parent) :
     label5 = new QLabel("5×5:");
     label6 = new QLabel("6×6:");
     label7 = new QLabel("7×7:");
-    tipLabel = new QLabel("Tip: Random按钮生成的是随机有解的关卡");
+    tipLabel = new QLabel("Tip: Random生成的是随机有解的关卡");
     QVBoxLayout *vt2 = new QVBoxLayout(chooseDialog);
     QGridLayout *gt = new QGridLayout();
     vt2->addLayout(gt);
@@ -200,11 +200,7 @@ void Widget::paintEvent(QPaintEvent *) {
     }
     if (m_gen == NULL)
         return;
-    /*m_gen->newGame(m_size, m_x, m_y, m_arr, m_sizePrev);
-    if (m_path != NULL)
-        delete []m_path;
-    m_path = new std::vector<QPoint>[m_size];*/
-    
+
     //for (int i = 0; i < m_pairNum * 2; ++i) {
     //    qDebug() << m_x[i] << " " << m_y[i];
     //}
@@ -215,18 +211,10 @@ void Widget::paintEvent(QPaintEvent *) {
     m_ltx = w / 2 - s / 2;
     m_lty = h / 2 - s / 2 + 20;
     painter.setPen(Qt::yellow);
-    //painter.drawRect(cX - s / 2, cY - s / 2, s, s);
     for (int i = 0; i <= m_size; ++i) {
         painter.drawLine(m_ltx, m_lty + s / m_size * i, m_ltx + s, m_lty + s / m_size * i);
         painter.drawLine(m_ltx + s / m_size * i, m_lty, m_ltx + s / m_size * i, m_lty + s);
     }
-   /*for (int i = 0; i < m_size; ++i)
-        for (int j = 0; j < m_size; ++j) {
-            int x = getX(i), y = getY(j);
-            painter.setPen(cc[(i + j) % 7]);
-            painter.setBrush(cc[(i + j) % 7]);
-            painter.drawEllipse(QPoint(x, y), 420 / m_size / 2 - 10, 420 / m_size / 2 - 10);
-        }*/
     for (int i = 0; i < m_pairNum; ++i) {
         for (int j = 0; j < 2; ++j) {
             int x = getX(m_x[i * 2 + j]), y = getY(m_y[i * 2 + j]);
@@ -390,14 +378,6 @@ void Widget::prevGame() {
             m_num += 3;
         chooseLevel(QString::number(m_size) + "_" + QString::number(m_num));
     }
-    /*emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
-    if (m_path != NULL)
-        delete []m_path;
-    m_path = new std::vector<QPoint>[m_pairNum];
-    for (int i = 0; i < m_pairNum; ++i)
-        m_path[i].clear();
-    m_move = 0;
-    this->repaint();*/
     qDebug() << "End Widget::prevGame";
 }
 
@@ -414,15 +394,6 @@ void Widget::nextGame() {
             m_num -= 3;
         chooseLevel(QString::number(m_size) + "_" + QString::number(m_num));
     }
-    /*emit newGame(m_size, m_x, m_y, m_arr, m_sizePrev, m_pairNum, m_num);
-    if (m_path != NULL)
-        delete []m_path;
-    m_path = new std::vector<QPoint>[m_pairNum];
-    for (int i = 0; i < m_pairNum; ++i)
-        m_path[i].clear();
-    m_move = 0;
-    this->repaint();*/
-    
     qDebug() << "End Widget::nextGame";
 }
 
