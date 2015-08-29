@@ -12,6 +12,7 @@
 #include <QDialog>
 #include <QSignalMapper>
 #include <QMediaPlayer>
+#include <QSound>
 #include <vector>
 #include "gamegenfromfile.h"
 #include "gamegenrandom.h"
@@ -483,8 +484,10 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
                     isMousePress = false;
                     isDrawing = -1;
                 }else {
-                    if (isConnected(m_arr[i][j]))
-                        waterSound->play();
+                    if (isConnected(m_arr[i][j])) {
+                        QSound::play(":/sound/water.wav");
+                        //waterSound->play();
+                    }
                     int color = m_arr[i][j];
                     while (m_path[color].size() > 0) {
                         int t = (int)m_path[color].size() - 1;
@@ -504,7 +507,8 @@ void Widget::mouseMoveEvent(QMouseEvent *event) {
                 }
             }else {
                 if (isInitalPoint(i, j) && !isPathSource(i, j)) {
-                    dingSound->play();
+                    QSound::play(":/sound/ding.wav");
+                    //dingSound->play();
                     
                     m_arr[i][j] = isDrawing;
                     m_path[isDrawing].push_back(QPoint(i, j));

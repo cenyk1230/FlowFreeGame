@@ -29,4 +29,5 @@ FORMS    += widget.ui
 
 DISTFILES +=
 
-RESOURCES +=
+RESOURCES += \
+    sound.qrc

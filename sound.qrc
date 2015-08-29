@@ -1,6 +1,6 @@
 <RCC>
     <qresource prefix="/sound">
-        <file>ding.mov</file>
-        <file>water.mov</file>
+        <file>ding.wav</file>
+        <file>water.wav</file>
     </qresource>
 </RCC>
