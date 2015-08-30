@@ -13,7 +13,7 @@ GameGenFromFile::GameGenFromFile(QObject *parent) : GameGen(parent), m_num(0), m
 void GameGenFromFile::newGame(int size, int *&x, int *&y, int **&arr, int lastSize, int &pairNum, int num) {
     qDebug() << "Begin GameGenFromFile::newGame";
     m_size = size;
-    QString fileName = QString::number(m_size) + "_" + QString::number(num) + ".txt";
+    QString fileName = ":/map/" + QString::number(m_size) + "_" + QString::number(num) + ".txt";
     QFile f(fileName);
     if (!f.open(QIODevice::ReadOnly)) {
         qDebug() << "Can't read file";

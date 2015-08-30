@@ -30,4 +30,5 @@ FORMS    += widget.ui
 DISTFILES +=
 
 RESOURCES += \
-    sound.qrc
+    sound.qrc \
+    map.qrc

@@ -125,14 +125,14 @@ Widget::Widget(QWidget *parent) :
     cvt->addWidget(conButton);
     //conDialog->show();
     
-    dingSound = new QMediaPlayer();
-    waterSound = new QMediaPlayer();
+    //dingSound = new QMediaPlayer();
+    //waterSound = new QMediaPlayer();
 
     
-    dingSound->setMedia(QUrl::fromLocalFile("/Users/Roger/Qt/Projects/FlowFreeGame/ding.mov"));
+    /*dingSound->setMedia(QUrl::fromLocalFile("/Users/Roger/Qt/Projects/FlowFreeGame/ding.mov"));
     dingSound->setVolume(30);
     waterSound->setMedia(QUrl::fromLocalFile("/Users/Roger/Qt/Projects/FlowFreeGame/water.mov"));
-    waterSound->setVolume(60);
+    waterSound->setVolume(60);*/
     
     connect(choose, SIGNAL(clicked(bool)), chooseDialog, SLOT(show()));
     connect(solution, SIGNAL(clicked(bool)), this, SLOT(solve()));
